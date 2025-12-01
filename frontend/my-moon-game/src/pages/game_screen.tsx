@@ -13,6 +13,7 @@ import { Moon, DiscoOverlay, InfraredOverlay } from "../components/overlays";
 
 
 const GameScreen: React.FC<MissionResult> = ({ Success, Fail }) => {
+  // Game global variables
   const [time, setTime] = useState(INITIAL_TIME);
   const [isRunning, setIsRunning] = useState(true);
   const [missionFailed, setMissionFailed] = useState(false);
@@ -22,7 +23,6 @@ const GameScreen: React.FC<MissionResult> = ({ Success, Fail }) => {
   const [lightsOn, setLightsOn] = useState(false);
   const [lightColor, setLightColor] = useState("#ff0000");
   const [speed, setSpeed] = useState(0);
-
   const [cabinPressureOn, setCabinPressureOn] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [thrustersEjected, setThrustersEjected] = useState(false);
@@ -52,7 +52,7 @@ const GameScreen: React.FC<MissionResult> = ({ Success, Fail }) => {
     };
     setAliens((prev) => [...prev, nextAlien]);
   };
-  //Fire Blaster 
+  //Fire Blaster logic
   const fireBlast = () => {
     if (!target) return;
     let killed = false;
@@ -107,21 +107,20 @@ const GameScreen: React.FC<MissionResult> = ({ Success, Fail }) => {
   
   // Random alien spawns while time > 0
   useEffect(() => {
-      if (!isRunning) return;
-      let timer: NodeJS.Timeout;
+  if (!isRunning) return;
+  let timer: ReturnType<typeof setTimeout>;
 
-      const spawnRandomAlien = () => {
-        if (time > 0) {
-          spawnNextAlien(); // spawn one alien
-          const nextTime = 5000 + Math.random() * 5000; // 5–10 seconds
-          timer = setTimeout(spawnRandomAlien, nextTime);
-        }
-      };
+  const spawnRandomAlien = () => {
+    if (time > 0) {
+      spawnNextAlien();
+      const nextTime = 5000 + Math.random() * 5000;
+      timer = setTimeout(spawnRandomAlien, nextTime);
+    }
+  };
+  spawnRandomAlien();
+  return () => clearTimeout(timer);
+}, [isRunning]);
 
-      spawnRandomAlien(); // first alien spawns here
-
-      return () => clearTimeout(timer);
-    }, [isRunning]);
 
   //  time updates correctly
   const timeRef = useRef(time);
@@ -158,7 +157,7 @@ const GameScreen: React.FC<MissionResult> = ({ Success, Fail }) => {
     return () => clearInterval(interval);
   }, [isRunning, cabinPressureOn, landingGearOn, thrustersEjected, time]);
 
-  // Success / Failure
+  // Success / Failure mechanic 
   useEffect(() => {
     if (time === 0) Success();
   }, [time, Success]);
@@ -173,7 +172,8 @@ const GameScreen: React.FC<MissionResult> = ({ Success, Fail }) => {
 };
 //////////////////////////////////////////////
 ////////////////////////////////////////////// 
-  return (
+  
+return (
     <div
       style={{
         width: "100vw",
@@ -184,6 +184,7 @@ const GameScreen: React.FC<MissionResult> = ({ Success, Fail }) => {
         overflow: "hidden",
       }}
       onClick={handleScreenClick}>
+     {/* Dashboard object that displays messages and stats */}
       <Dashboard
         time={time}
         landingGearOn={landingGearOn}
@@ -191,6 +192,7 @@ const GameScreen: React.FC<MissionResult> = ({ Success, Fail }) => {
         statusMessage={statusMessage}
         alienWarning={alienWarning}
         aliens={aliens}/>
+      {/* Control objects that contains the interactors */}
       <Controls
         lightsOn={lightsOn}
         lightColor={lightColor}
@@ -215,21 +217,44 @@ const GameScreen: React.FC<MissionResult> = ({ Success, Fail }) => {
         setInfraredOn={setInfraredOn}
 
         triggerFailure={triggerFailure}
-        fireBlast={fireBlast}
-      />
+        fireBlast={fireBlast}/>
+      {/* Moon object that controls moon growing as you approach */}
       <Moon time={time} />
+      {/* Controls the disco effect */}
       <DiscoOverlay enabled={discoOn} />
+      {/* Controls the infared effect */}
       <InfraredOverlay enabled={infraredOn} />
 
       
-      
-
       {/* Aliens */}
-      {aliens.map((a, i) => a.alive && <img key={i} src={alienImg} className="alien" onClick={(e) => { e.stopPropagation(); handleAlienClick(a); }} style={{ position: "absolute", top: a.y, left: a.x, width: 50, height: 50, zIndex: 900, cursor: "pointer" }} />)}
+      {aliens.map((a, i) => 
+      a.alive && 
+      <img 
+        key={i} 
+        src={alienImg} 
+        className="alien" 
+        onClick={(e) => { e.stopPropagation(); handleAlienClick(a); }}
+        style={{ position: "absolute", 
+                top: a.y, 
+                left: a.x, 
+                width: 50, 
+                height: 50, 
+                zIndex: 900, 
+                cursor: "pointer" }} />)}
 
       {/* Target marker */}
-      {target && <div style={{ position: "absolute", top: target.y, left: target.x, width: 60, height: 60, border: "3px solid orange", borderRadius: "50%", pointerEvents: "none", zIndex: 950, transform: "translate(-50%, -50%)" }} />}
-    </div>
+      {target && 
+        <div style={{ position: "absolute", 
+                      top: target.y, 
+                      left: target.x, 
+                      width: 60, 
+                      height: 60, 
+                      border: "3px solid orange", 
+                      borderRadius: "50%", 
+                      pointerEvents: "none", 
+                      zIndex: 950, 
+                      transform: "translate(-50%, -50%)" }} />}
+        </div>
   );
 };
 

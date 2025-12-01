@@ -1,4 +1,4 @@
-// src/interactors/Slider.tsx
+// Contains UI and logic for a basic slider
 import React, { useRef, useState } from "react";
 
 interface SliderProps {
