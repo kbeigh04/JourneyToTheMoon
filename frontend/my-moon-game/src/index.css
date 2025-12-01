@@ -11,3 +11,10 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* index.css */
+@keyframes discoPulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 0.9; }
+  100% { opacity: 0.8; }
+}
