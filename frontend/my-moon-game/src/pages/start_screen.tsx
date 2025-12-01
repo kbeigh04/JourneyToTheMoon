@@ -18,6 +18,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
         alignItems: "center",
       }}
     >
+      {/* Button to start of game */}
       <button
         onClick={onStart}
         style={{
